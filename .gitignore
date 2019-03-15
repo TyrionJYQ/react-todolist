@@ -1,3 +1,5 @@
 /node_modules
 /todoServer/node_modules
 /todoFront/node_modules
+/todoFront/dist
+/todoFront/.cache
