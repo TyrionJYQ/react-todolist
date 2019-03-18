@@ -50,4 +50,4 @@ you can send http request through ajax.
 
 - download in your local
 - npm install
-- node app.js or click start.cmd.
+- node app.js or click start.cmd.   修改文件同步测试
