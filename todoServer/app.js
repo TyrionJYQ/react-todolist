@@ -12,6 +12,8 @@ let app = new Koa();
 app.listen(port, () => {
   console.log(`服务器成功启动，端口号为${port}`);
 });
+// 解析请求体数据
+app.use(require('koa-bodyparser')());
 
 // 引入各个路由对象，并配置中间件
 const todoRouter = require('./routers/todoRouter');

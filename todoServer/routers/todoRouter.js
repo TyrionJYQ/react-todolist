@@ -8,5 +8,6 @@ module.exports = router;
 
 router.get('/', todoController.test)
 .get('/todolist/userTodos', todoController.getUserTodos)
-  .get('/todolist/userTodos/status', todoController.getUserTodosByStatus)
-// 导出给app。进行配置中间件
+.get('/todolist/userTodos/status', todoController.getUserTodosByStatus)
+.post('/todolist/newTodos', todoController.addNewTodos)
+
