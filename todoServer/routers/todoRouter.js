@@ -10,4 +10,4 @@ router.get('/', todoController.test)
 .get('/todolist/userTodos', todoController.getUserTodos)
 .get('/todolist/userTodos/status', todoController.getUserTodosByStatus)
 .post('/todolist/newTodos', todoController.addNewTodos)
-
+.put('/todolist/newTodos', todoController.updateTodos)
