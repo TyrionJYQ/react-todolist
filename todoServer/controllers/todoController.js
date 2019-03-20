@@ -3,7 +3,8 @@ const {
   getUserTodosByStatus,
   addNewTodo,
   findTodoByUserIdAndTodoId,
-  updateTodoByParam } = require('../models/todoModel');
+  updateTodoByParam,
+  deleteTodoBytodoId } = require('../models/todoModel');
 const errObj = {
   code: '002',
   msg: '出错了，程序员正在赶来的路上。。。'
@@ -63,16 +64,20 @@ module.exports = {
     let userId = ctx.query.userId;
     let { todoDesc, time, status, todoId } = JSON.parse(ctx.query.todo);
     // 根据用户ID和userId查找到对应的待办事项，如果不存在code:002
-    let result = await findTodoByUserIdAndTodoId([userId, todoId]);
-    log('查询需要修改的待办事项id为:', result, typeof result);
-    if (!result.todoId) {
-      console.log(result)
-      ctx.body = { code: '002', msg: '待办事项不存在' };
-    }
+    let findResults = await findTodoByUserIdAndTodoId([userId, todoId]);
+    if (findResults.length === 0) return ctx.body = { code: '002', msg: '待办事项不存在' };
+    log('查询需要修改的待办事项todoId为:', findResults[0].todoId);
     // 查找到修改的待办事项进行更新操作，返回code: 001
     let updateResult = await updateTodoByParam([todoDesc, status, time,todoId]);
     if (updateResult.affectedRows) return ctx.body = {code: '001', msg:'更新成功!'};
     ctx.body = {code: '002', msg: '修改失败'};
-
-  }
+  },
+  deleteTodosByTodoId: async (ctx, next) => {
+    let {todoId, userId} = ctx.query;
+    let findResults = await findTodoByUserIdAndTodoId([userId, todoId]);
+    if (findResults.length === 0) return ctx.body = { code: '002', msg: '待办事项不存在' };
+    let result = await deleteTodoBytodoId(todoId);
+    if (result.affectedRows === 1) return ctx.body = {code: '001', msg: '删除成功'};
+    ctx.body = errObj;
+  } 
 };
