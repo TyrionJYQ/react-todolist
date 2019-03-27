@@ -1,6 +1,11 @@
 #app {
+    margin: 0 auto;
     padding: 20px 20px 0px 20px;
+  
 }
 .ant-page-header {
     margin-bottom: 30px !important;
+}
+a {
+  margin-right: 10px;
 }

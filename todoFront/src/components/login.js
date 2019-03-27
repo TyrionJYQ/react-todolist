@@ -2,13 +2,13 @@ import React from 'react';
 import {
   Form, Icon, Input, Button, Checkbox,
 } from 'antd';
-// import '../common/css/common.css';
 
 class NormalLoginForm extends React.Component {
   handleSubmit(e) {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
+        this.props.onSubmit(values)
         console.log('Received values of form: ', values);
       }
     });
@@ -47,7 +47,7 @@ class NormalLoginForm extends React.Component {
           <Button type="primary" htmlType="submit" className="login-form-button" style={loginStyle.w}>
             登录
           </Button>或
-          <a href="">现在注册!</a>
+          <a href={"javascript:void(0)"}>现在注册!</a>
         </Form.Item>
       </Form>
     );

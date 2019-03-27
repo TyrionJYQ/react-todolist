@@ -4,15 +4,15 @@ module.exports = {
     switch (location.pathname) {
       case "/":
         obj.route = "/";
-        obj.status = "登录";
+        obj.text = "去注册";
         break;
       case "/login":
         obj.route = "/login";
-        obj.status = "登录";
+        obj.text = "去注册";
         break;
       case "/register":
         obj.route = "/register";
-        obj.status = "注册";
+        obj.text = "去登录";
         break;
     }
     return obj;
