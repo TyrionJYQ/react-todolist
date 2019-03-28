@@ -12,6 +12,8 @@ let app = new Koa();
 app.listen(port, () => {
   console.log(`服务器成功启动，端口号为${port}`);
 });
+// 处理跨域
+app.use(require('koa2-cors')());
 // 解析请求体数据
 app.use(require('koa-bodyparser')());
 

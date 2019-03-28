@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Form, Input, Tooltip, Icon, Select, Row, Col, Checkbox, Button, AutoComplete,
 } from 'antd';
-
+import api from '../common/js/api';
 const { Option } = Select;
 const AutoCompleteOption = AutoComplete.Option;
 class RegistrationForm extends React.Component {
@@ -10,12 +10,16 @@ class RegistrationForm extends React.Component {
     confirmDirty: false,
     autoCompleteResult: [],
   };
-
   handleSubmit = (e) => {
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
-        console.log('Received values of form: ', values);
+        console.log(values);
+        this.props.register({
+          userName: values.userName,
+          password: values.password,
+          email: values.email
+        })
       }
     });
   }
@@ -129,7 +133,7 @@ class RegistrationForm extends React.Component {
             </span>
           )}
         >
-          {getFieldDecorator('用户名', {
+          {getFieldDecorator('userName', {
             rules: [{ required: true, message: '请输入用户名!', whitespace: true }],
           })(
             <Input />
