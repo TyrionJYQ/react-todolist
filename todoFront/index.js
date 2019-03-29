@@ -66,6 +66,7 @@ class Page extends React.Component {
             text: data.user.userName
           }
         });
+        localStorage.setItem('user', JSON.stringify(data.user)); 
       } else {
         message.error('用户名或密码错误');
       }
