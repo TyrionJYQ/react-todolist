@@ -5,6 +5,7 @@ import Register from './src/components/register'
 import Header from "./src/components/header";
 import Main from "./src/components/main";
 import api from './src/common/js/api';
+import { getLoginStatus } from "./src/common/js/utils";
 import { Modal, Button, message } from 'antd';
 import zhCN from "antd/lib/locale-provider/zh_CN";
 import moment from "moment";
@@ -13,8 +14,6 @@ import "antd/dist/antd.css";
 import "./src/common/css/common.css"
 moment.locale("zh-cn");
 
-
-import { getLoginStatus } from "./src/common/js/utils";
 class Page extends React.Component {
   constructor(props) {
     super(props);
@@ -24,6 +23,7 @@ class Page extends React.Component {
     }
   }
   getStatus() {
+    if(this.state.status.route === '/main') return;
     switch (location.pathname) {
       case '/':
       case '/login':
@@ -49,21 +49,27 @@ class Page extends React.Component {
         this.setState({
           status: {
             route: '/main',
-            text: '主页'
+            text: '用户名'
           }
         })
         break;
     }
   }
-  onSubmit(param) {
-    console.log(param)
-    history.pushState({ main: 'main' }, "", "main")
-    this.setState({
-      status: {
-        route: '/main',
-        text: '欢迎' + param.userName
+  onSubmit(params) {
+    api.post('login', params, data => {
+      if (data.code === '01') {
+        message.success('登录成功，正前往主页');
+        history.pushState({ main: 'main' }, "", "main");
+        this.setState({
+          status: {
+            route: '/main',
+            text: data.user.userName
+          }
+        });
+      } else {
+        message.error('用户名或密码错误');
       }
-    })
+    }, err => console.log(err));
   }
   handleOk() {
     this.setState({
@@ -82,7 +88,6 @@ class Page extends React.Component {
 
   doRegister(params) {
     api.post('register', params, data => {
-      console.log(data);
       if (data.code === '01') {
         this.setState({
           visible: true

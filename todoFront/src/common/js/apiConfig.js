@@ -4,5 +4,6 @@ const server = {
 }
 const currentServer = server.dev;
 module.exports = {
-  register: currentServer + '/todolist/users/userRegister'
+  register: currentServer + '/todolist/users/userRegister',
+  login: currentServer + '/todolist/users/userLogin'
 };

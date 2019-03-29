@@ -30,13 +30,13 @@ module.exports = {
   login: async (ctx, next) => {
     try {
       // 非空校验
-      let { userId, password } = ctx.request.body;
-      if (!userId) return ctx.body = { code: '02', msg: '用户Id不能为空' };
+      let { userName, password } = ctx.request.body;
+      if (!userName) return ctx.body = { code: '02', msg: '用户名不能为空' };
       if (!password) return ctx.body = { code: '02', msg: '密码不能为空' };
       // 用户名和密码一致性校验
-      let consultedPassword = await checkUserIsExits(userId);
-      if (consultedPassword[0].password !== password) return ctx.body = { code: '02', msg: '用户名或密码不正确' };
-      ctx.body = { code: '01', msg: '登录成功' }
+      let userObj = await doLogin(userName);
+      if (userObj[0].password !== password) return ctx.body = { code: '02', msg: '用户名或密码不正确' };
+      ctx.body = { code: '01', msg: '登录成功', user: {userName: userName, userId: userObj[0].userId}}
     } catch (e) {
       console.log(e);
       ctx.body = {
