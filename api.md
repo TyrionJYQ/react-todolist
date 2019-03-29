@@ -104,7 +104,7 @@
 | 参数     | 必选   | 类型     | 说明                                       |
 | ------ | ---- | ------ | ---------------------------------------- |
 | userId | Y    | String | 用户ID                                     |
-| todos  | Y    | Array  | [{todoDesc:'吃饭', time: 000000, status: 'NEW'}] |
+| todo   | Y    | Object | {todoDesc:'吃饭', time: 000000, status: 'NEW'} |
 
 ##### 响应参数
 
@@ -121,7 +121,7 @@
 >
 > ```javascript
 > {
->   code: '002',
+>   code: '02',
 >   message: '新增待办事项失败'
 > }
 > ```
@@ -130,7 +130,7 @@
 >
 > ```javascript
 > {
->   code: '001',
+>   code: '01',
 >   userId: 1,
 >   todos: [  {todoDesc:'吃饭', time: 000000, status: 'undone'},
 >           	{todoDesc:'睡觉', time: 000000, status: 'completed'}

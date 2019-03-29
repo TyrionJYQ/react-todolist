@@ -5,5 +5,7 @@ const server = {
 const currentServer = server.dev;
 module.exports = {
   register: currentServer + '/todolist/users/userRegister',
-  login: currentServer + '/todolist/users/userLogin'
+  login: currentServer + '/todolist/users/userLogin',
+  createTodo: currentServer + '/todolist/newTodos',
+  getTodos: currentServer + '/todolist/userTodos',
 };
