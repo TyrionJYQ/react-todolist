@@ -8,4 +8,6 @@ module.exports = {
   login: currentServer + '/todolist/users/userLogin',
   createTodo: currentServer + '/todolist/newTodos',
   getTodos: currentServer + '/todolist/userTodos',
+  deleteUserTodo: currentServer + '/todolist/Todos',
+  updateTodo: currentServer + '/todolist/newTodo'
 };

@@ -58,8 +58,8 @@ module.exports = {
     }
   },
   updateTodos: async (ctx, next) => {
-    let userId = ctx.query.userId;
-    let { todoDesc, time, status, todoId } = JSON.parse(ctx.query.todo);
+	console.log(ctx.request.body);
+	let { userId, todo: {todoDesc, time, status, todoId} } = ctx.request.body;
     // 根据用户ID和userId查找到对应的待办事项，如果不存在code:002
     let findResults = await findTodoByUserIdAndTodoId([userId, todoId]);
     if (findResults.length === 0) return ctx.body = { code: '002', msg: '待办事项不存在' };

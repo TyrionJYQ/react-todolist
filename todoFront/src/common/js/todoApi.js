@@ -16,5 +16,16 @@ module.exports = {
     api.post('createTodo', {userId, todo}, data => {
       resolve(data);
     }, err => reject(err));
-  }) 
+  }),
+
+  deleteUserTodo: todoObj => new Promise((resolve, reject) => {
+    api.delete('deleteUserTodo',todoObj, data => {
+      resolve(data)
+    },
+    err => reject(err));
+  }),
+
+  updateTodo: todo => new Promise((resolve, reject) => {
+    api.post('updateTodo', {userId, todo}, data => resolve(data), err => reject(err));
+  })
 }
