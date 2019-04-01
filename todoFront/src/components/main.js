@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDom from 'react-dom';
-import { Table, Divider, Tag, Button, Modal, Input, message, Popconfirm, Form } from 'antd';
+import { Table, Divider, Tag, Button, Modal, Input, message, Popconfirm, Form, Radio } from 'antd';
 import { getAllTodos, createNewTodo, deleteUserTodo, updateTodo } from '../common/js/todoApi'
-
+import { formatTimesmap } from '../common/js/utils'
 class Main extends React.Component {
   constructor(props) {
     super(props);
@@ -10,13 +10,23 @@ class Main extends React.Component {
       modalVisible: false,
       todoDesc: '',
       tableData: [],
+      originTableData: [],
       operationType: 'add'
     },
       this.columns = [{
         title: '描述',
-        dataIndex: 'todoDesc',
         key: 'todoDesc',
-        width: '40%'
+        width: '40%',
+        render: row => {
+          {/*当前事务状态为待完成，单击radio弹出提示是否修改状态为已完成。如果状态为已完成，单选框disabled*/}
+          return (
+            <span>
+              <Popconfirm title="状态变为已完成?" onConfirm={this.setStausCompleted.bind(this, row)} onCancel={() => {return;}} okText="是" cancelText="否">
+                <Radio checked={row.status !== 'NEW'} disabled = {row.status !== 'NEW'}>{row.todoDesc}</Radio>
+              </Popconfirm>
+            </span>
+          )
+        }
       }, {
         title: '状态',
         key: 'status',
@@ -34,10 +44,10 @@ class Main extends React.Component {
         width: '20%',
         render: row => (
           <span>
-            <a onClick={e => this.openModal(e, row)}>修改</a>
-            <Popconfirm title="确定删除当前待办事务吗?" onConfirm={() => this.deleteTodo(row)} onCancel={console.log('')} okText="是" cancelText="否">
+            <Popconfirm title="确定删除当前待办事务吗?" onConfirm={() => this.deleteTodo(row)} onCancel={() => {return}} okText="是" cancelText="否">
               <a href="#">删除</a>
             </Popconfirm>
+            <a onClick={e => this.openModal(e, row)} className={row.status === 'COMPLETED' ? 'hide' : ''}>修改</a>
           </span>
         ),
       },
@@ -45,13 +55,39 @@ class Main extends React.Component {
         title: '创建时间',
         dataIndex: 'time',
         key: 'time',
-        width: '20%'
+        width: '20%',
+        render: time => (
+          <span>{formatTimesmap(time)}</span>
+        )
       }];
     this.todoId = '';
   }
+
+  filterTableDataByStatus(status) {
+    let { originTableData } = this.state;
+    let _this = this;
+    let _getTempData = function() {
+      let tempData = originTableData.filter(data => data.status === status);
+      _this.setState({tableData: tempData});
+    }
+    switch(status) {
+      case 'ALL':
+        this.setState({ tableData: originTableData});
+        break;
+      case 'COMPLETED':
+        _getTempData();
+        break;
+      case 'NEW':
+        _getTempData();
+        break;
+      default:
+        break;
+        
+    }
+  }
+ 
   setModalVisible(modalVisible) {
     this.setState({ modalVisible, operationType: 'add' });
-    // 关闭modal清空上次输入的值
     if (!modalVisible) this.state.todoDesc = '';
   }
   changeValue(e) {
@@ -60,22 +96,22 @@ class Main extends React.Component {
     })
   }
   componentDidMount() {
-    // 获取所有待办事项
     let _this = this;
     getAllTodos().then(
-      data => _this.setState({ tableData: data.todos })
+      data => _this.setState({ tableData: data.todos, originTableData: data.todos})
       , err => console.log(err)
     )
   }
+  getIndexByTodoId(todoId) {
+    return this.state.tableData.findIndex(data => data.todoId === todoId);
+  }
 
-  // 删除待办事项
   deleteTodo(row) {
-    console.log(row);
     let { userId, todoId } = row;
     deleteUserTodo({ userId, todoId }).then(data => {
       if (data.code === '002') return message.warning(data.msg);
       message.success('删除成功');
-      let index = this.state.tableData.findIndex(data => data.todoId === todoId);
+      let index = this.getIndexByTodoId(todoId);
       this.state.tableData.splice(index, 1);
       this.setState({ tableData: this.state.tableData });
     }, err => message.error('出错了，无法删除'));
@@ -98,13 +134,28 @@ class Main extends React.Component {
         status: 'NEW',
         todoId: todoId
       };
-   
-    updateTodo(todo).then(data => console.log(data), err => console.log(err));
+    updateTodo(todo).then(data => {
+      if(data.code === '002') return message.info(data.message);
+      message.success('修改待办事项成功');
+      let index = this.getIndexByTodoId(todo.todoId);
+      this.state.tableData[index] = todo;
+      this.setState({
+        tableData: this.state.tableData
+      })
+      this.setModalVisible(false);
+    }, err => console.log(err));
   }
 
-  // 修改待办事项状态
-  updateTodoStatus() {
-
+  setStausCompleted(todo) {
+    let _todo = Object.assign(todo, {status: 'COMPLETED', time: Date.now()});
+    updateTodo(_todo).then(data => {
+      if (data.code === '002') return message.info('状态变更失败');
+      let index = this.getIndexByTodoId(todo.todoId);
+      let {tableData} = this.state;
+      tableData[index].status = 'COMPLETED';
+      message.success('状态修改成功!')
+      this.setState({ tableData});
+    })
   }
 
   // 新建待办事项
@@ -151,8 +202,13 @@ class Main extends React.Component {
           onCancel={() => this.setModalVisible(false)}>
           <Input placeholder="请输入待办事项" value={this.state.todoDesc} onChange={e => this.changeValue(e)} />
         </Modal>
-        <Table columns={this.columns} dataSource={this.state.tableData} rowKey={(r, i) => (i)} scroll={{ y: 250 }} />
-        <Button type="primary" size="large" onClick={() => this.setModalVisible(true)}>新建</Button>
+        <Table columns={this.columns} pagination={{ pageSize: 15}} dataSource={this.state.tableData} rowKey={(r, i) => (i)} scroll={{ y: 300 }} />
+        <div className="button-wrapper">
+          <Button type="primary"  onClick={() => this.setModalVisible(true)}>新建</Button>
+          <Button type="primary"  onClick={() => this.filterTableDataByStatus('NEW')}>待完成</Button>
+          <Button type="primary"  onClick={() => this.filterTableDataByStatus('COMPLETED')}>已完成</Button>
+          <Button type="primary"  onClick={() => this.filterTableDataByStatus('ALL')}>所有</Button>
+        </div>
       </div>
     )
   }

@@ -16,5 +16,12 @@ module.exports = {
         break;
     }
     return obj;
+  },
+  formatTimesmap: timesmap => {
+    var time = new Date(timesmap);
+    var year = time.getFullYear();
+    var month = time.getMonth() + 1;
+    var day = time.getDay();
+    return `${year}/${month}/${day}`;
   }
 };
